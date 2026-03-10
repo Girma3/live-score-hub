@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Match {
+  id            Int          @id @default(autoincrement())
+  homeTeam      String
+  awayTeam      String
+  homeTeamScore Int          @default(0)
+  awayTeamScore Int          @default(0)
+  status        MatchStatus  @default(SCHEDULED)
+  startTime     DateTime     @default(now())
+  endTime       DateTime?
+  createdAt     DateTime     @default(now())
+  sport         SportType
+  commentaries  Commentary[]
+}
+
+model Commentary {
+  id        Int            @id @default(autoincrement())
+  matchId   Int
+  match     Match          @relation(fields: [matchId], references: [id])
+  minute    Int
+  sequence  Int
+  period    MatchPeriod
+  eventType CommentaryType
+  actor     String?
+  team      String?
+  message   String
+  metadata  Json? // flexible payload for extra info
+  tags      String[]
+  createdAt DateTime       @default(now())
+}
+
+enum MatchStatus {
+  PENDING
+  SCHEDULED
+  LIVE
+  HALFTIME
+  FINISHED
+  POSTPONED
+  CANCELLED
+  IN_REVIEW
+}
+
+enum SportType {
+  FOOTBALL
+  BASKETBALL
+  TENNIS
+  VOLLEYBALL
+}
+
+enum MatchPeriod {
+  FIRST_HALF
+  SECOND_HALF
+  EXTRA_TIME
+  PENALTIES
+}
+
+enum CommentaryType {
+  GOAL
+  FOUL
+  SUBSTITUTION
+  GENERAL
+}
