@@ -1,0 +1,33 @@
+{
+  "name": "live-score-hub",
+  "version": "1.0.0",
+  "description": "live score hub is a web application that provides real-time updates on sports scores and events.",
+  "scripts": {
+    "dev": "nodemon backend/index.js",
+    "start": "node backend/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Girma3/live-score-hub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Girma3/live-score-hub/issues"
+  },
+  "homepage": "https://github.com/Girma3/live-score-hub#readme",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "^7.4.2",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14",
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "prisma": "^7.4.2"
+  }
+}
