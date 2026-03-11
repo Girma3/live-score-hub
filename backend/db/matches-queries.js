@@ -10,6 +10,7 @@ async function createMatch(matchData) {
         homeTeam: matchData.homeTeam,
         awayTeam: matchData.awayTeam,
         startTime: matchData.startTime,
+        sport: matchData.sport,
       },
     });
     if (existingMatch) {

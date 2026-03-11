@@ -11,13 +11,24 @@ async function createNewMatch(req, res) {
   if (!parsedData.success) {
     return res.status(400).json({ error: parsedData.error.issues });
   }
-  const { startTime, endTime } = parsedData;
+  const { startTime, endTime } = parsedData.data;
   try {
     const matchStatus = await getMatchStatus(startTime, endTime);
     const match = await createMatch({
       ...parsedData.data,
       status: matchStatus,
     });
+
+    //for web socket
+    if (res.app.locals.broadcastMatchCreated) {
+      //  the API response work even if z broadcast failed
+      try {
+        res.app.locals.broadcastMatchCreated(match);
+      } catch (broadcastError) {
+        console.error("WebSocket broadcast failed:", broadcastError);
+      }
+    }
+
     return res
       .status(201)
       .json({ message: "Match created successfully", data: match });
