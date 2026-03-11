@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "backend/db/prisma/.env" });
-console.log("DATABASE_URL:", process.env.DATABASE_URL);
+
 import express from "express";
+import matchRouter from "./routes/matches-route.js";
 const app = express();
 
 // Middleware to parse JSON requests
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.json({ message: "Hello, World!" });
 });
+app.use("/matches", matchRouter);
 
 // Start the server
 const port = 8000;
