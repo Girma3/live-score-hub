@@ -37,14 +37,12 @@ const MatchSchema = z.object({
       "IN_REVIEW",
     ])
     .default("SCHEDULED"),
-  startTime: z
-    .string()
+  startTime: z.union([z.string().transform((val) => new Date(val)), z.date()]),
 
-    .transform((val) => new Date(val)),
   endTime: z
-    .string()
-    .optional()
-    .transform((val) => (val ? new Date(val) : null)),
+    .union([z.string().transform((val) => new Date(val)), z.date()])
+    .nullable()
+    .optional(),
   createdAt: z.date().default(new Date()),
   sport: z
     .enum(["FOOTBALL", "BASKETBALL", "TENNIS", "VOLLEYBALL"])
@@ -91,6 +89,18 @@ const listMatchQueryValidation = z.object({
   status: z.enum(["SCHEDULED", "LIVE", "FINISHED", "CANCELLED"]).optional(),
   sport: z.enum(["FOOTBALL", "BASKETBALL", "TENNIS", "VOLLEYBALL"]).optional(),
 });
+
+const MATCH_STATUS = {
+  PENDING: "PENDING",
+  SCHEDULED: "SCHEDULED",
+  LIVE: "LIVE",
+  HALFTIME: "HALFTIME",
+  FINISHED: "FINISHED",
+  POSTPONED: "POSTPONED",
+  CANCELLED: "CANCELLED",
+  IN_REVIEW: "IN_REVIEW",
+};
+
 const validationResult = MatchSchema.safeParse(match);
 
 if (!validationResult.success) {
@@ -98,4 +108,9 @@ if (!validationResult.success) {
 } else {
   console.log("Validation successful");
 }
-export { match, MatchSchema, listMatchQueryValidation, CommentarySchema };
+export {
+  MATCH_STATUS,
+  MatchSchema,
+  listMatchQueryValidation,
+  CommentarySchema,
+};

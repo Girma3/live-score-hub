@@ -1,5 +1,5 @@
-import { match } from "../validation/match-validation.js";
-let MATCH_STATUS = match.status;
+import { MATCH_STATUS } from "../validation/match-validation.js";
+
 async function getMatchStatus(startTime, endTime, now = new Date()) {
   const start = new Date(startTime);
   const end = endTime ? new Date(endTime) : null;
