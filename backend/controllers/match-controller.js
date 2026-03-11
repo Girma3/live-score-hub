@@ -9,7 +9,7 @@ async function createNewMatch(req, res) {
   const parsedData = MatchSchema.safeParse(req.body);
 
   if (!parsedData.success) {
-    return res.status(400).json({ error: parsedData.error.errors });
+    return res.status(400).json({ error: parsedData.error.issues });
   }
   const { startTime, endTime } = parsedData;
   try {
@@ -24,7 +24,7 @@ async function createNewMatch(req, res) {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "Failed to create match", detail: JSON.stringify(error) });
+      .json({ error: "Failed to create match", detail: error });
   }
 }
 
@@ -34,7 +34,7 @@ async function getMatches(req, res) {
   if (!parsed.success) {
     return res.status(400).json({
       error: "Invalid query parameters",
-      detail: JSON.stringify(parsed.error.errors),
+      detail: parsed.error.issues,
     });
   }
   const limit = Math.min(parsed.data.limit ?? 50, MAX_LIMIT);
