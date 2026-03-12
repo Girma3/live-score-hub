@@ -26,30 +26,37 @@ function broadcast(wss, payload) {
 
 function attachWebSocketServer(server) {
   const wss = new WebSocketServer({
-    server,
-    path: "/ws",
+    noServer: true, // important: we’ll handle upgrade manually
     maxPayload: 1024 * 1024,
   });
 
-  wss.on("connection", async (socket, req) => {
+  // Handle upgrade requests
+  server.on("upgrade", async (req, socket, head) => {
     if (wsArcjet) {
       try {
         const decision = await wsArcjet.protect(req);
         if (decision.isDenied()) {
-          //try again and bot detected code
-          let code = decision.reason.isRateLimit() ? 1013 : 1008;
-          let reason = decision.reason.isRateLimit()
-            ? "Too many request!"
-            : "blocked by arcjet!";
-          socket.close(code, reason);
+          // Deny handshake before connection
+          socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
+          socket.destroy();
           return;
         }
       } catch (e) {
         console.error("wsArcjet error", e);
-        socket.close(1011, "server security error");
+        socket.write("HTTP/1.1 503 Service Unavailable\r\n\r\n");
+        socket.destroy();
         return;
       }
     }
+
+    // If allowed, proceed with upgrade
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit("connection", ws, req);
+    });
+  });
+
+  // Normal connection handling
+  wss.on("connection", (socket, req) => {
     sendJson(socket, { type: "welcome" });
 
     socket.on("error", (error) => {
