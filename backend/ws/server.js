@@ -1,4 +1,5 @@
 import { WebSocket, WebSocketServer } from "ws";
+import { wsArcjet } from "../arcjet/arcjet.js";
 
 function sendJson(socket, payload) {
   if (socket.readyState === WebSocket.OPEN) {
@@ -30,7 +31,25 @@ function attachWebSocketServer(server) {
     maxPayload: 1024 * 1024,
   });
 
-  wss.on("connection", (socket) => {
+  wss.on("connection", async (socket, req) => {
+    if (wsArcjet) {
+      try {
+        const decision = await wsArcjet.protect(req);
+        if (decision.isDenied()) {
+          //try again and bot detected code
+          let code = decision.reason.isRateLimit() ? 1013 : 1008;
+          let reason = decision.reason.isRateLimit()
+            ? "Too many request!"
+            : "blocked by arcjet!";
+          socket.close(code, reason);
+          return;
+        }
+      } catch (e) {
+        console.error("wsArcjet error", e);
+        socket.close(1011, "server security error");
+        return;
+      }
+    }
     sendJson(socket, { type: "welcome" });
 
     socket.on("error", (error) => {
