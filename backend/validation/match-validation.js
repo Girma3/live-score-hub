@@ -50,6 +50,9 @@ const MatchSchema = z.object({
 
   commentaries: z.array(CommentarySchema).optional(),
 });
+const matchIdParamsValidation = z.object({
+  matchId: z.coerce.number().int().positive(),
+});
 
 // Example usage
 const match = {
@@ -112,5 +115,6 @@ export {
   MATCH_STATUS,
   MatchSchema,
   listMatchQueryValidation,
+  matchIdParamsValidation,
   CommentarySchema,
 };
